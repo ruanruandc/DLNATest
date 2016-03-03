@@ -1047,6 +1047,8 @@ public class ContentDirectory extends ThreadCore implements ActionListener, Quer
 			requestedCount = nChildNodes;
 			
 		DIDLLite didlLite = new DIDLLite();
+		Log.i("ContentDirectory","requestedCount="+requestedCount);
+		//requestedCount = 50;
 		int numberReturned = 0;
 		for (int n=startingIndex; (n<nChildNodes && numberReturned<requestedCount); n++) {
 			ContentNode cnode = sortedContentNodeList.getContentNode(n);
@@ -1054,7 +1056,7 @@ public class ContentDirectory extends ThreadCore implements ActionListener, Quer
 			cnode.setParentID(objID);
 			numberReturned++;
 		}
-		
+		Log.i("ContentDirectory","size="+numberReturned);
 		String result = didlLite.toString();
 		action.setResult(result);
 		action.setNumberReturned(numberReturned);

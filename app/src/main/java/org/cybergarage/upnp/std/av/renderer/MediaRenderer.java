@@ -36,6 +36,7 @@ public class MediaRenderer extends Device
 	public final static String DEVICE_TYPE = "urn:schemas-upnp-org:device:MediaRenderer:1";
 	
 	public final static int DEFAULT_HTTP_PORT = 39520;
+	public final static String MEDIARENDERDER = "MediaRenderer";
 	
 	public final static String DESCRIPTION =
 		"<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" +
@@ -103,8 +104,8 @@ public class MediaRenderer extends Device
 	
 	public MediaRenderer(Context context) throws InvalidDescriptionException
 	{
-		this(String.format(DESCRIPTION, DeviceUtil.getFriendlyName(context, "MediaRenderer"),
-						DeviceUtil.getUUID(context, "MediaRenderer")),
+		this(String.format(DESCRIPTION, DeviceUtil.getFriendlyName(context, MEDIARENDERDER),
+						DeviceUtil.getUUID(context, MEDIARENDERDER)),
 				RenderingControl.SCPD,
 				ConnectionManager.SCPD,
 				AVTransport.SCPD);

@@ -27,7 +27,7 @@ public class DeviceUtil {
 				String friendlyName = Build.BRAND + " " + Build.MODEL +" " + device;
 				Editor editor = sharedPreferences.edit();
 		        editor.putString("friendlyName", friendlyName);
-		        editor.commit();
+		        editor.apply();
 				return friendlyName;
 			} else {
 				return sharedPreferences.getString("friendlyName", "");
@@ -44,7 +44,7 @@ public class DeviceUtil {
 			SharedPreferences sharedPreferences = context.getSharedPreferences(device, Context.MODE_PRIVATE);
 			Editor editor = sharedPreferences.edit();
 		    editor.putString("friendlyName", friendlyName);
-		    editor.commit();
+		    editor.apply();
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

@@ -33,7 +33,7 @@ public class FragmentAudioPre {
 			} while (cursor.moveToNext());
 		}
 		cursor.close();
-		
+		Log.i("audio.size",audios.size()+"");
 		return audios;
 	}
 	

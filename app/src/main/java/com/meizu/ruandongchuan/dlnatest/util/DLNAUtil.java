@@ -1,5 +1,8 @@
 package com.meizu.ruandongchuan.dlnatest.util;
 
+import android.os.Environment;
+import android.util.Log;
+
 import com.meizu.ruandongchuan.dlnatest.data.Audio;
 import com.meizu.ruandongchuan.dlnatest.data.Image;
 import com.meizu.ruandongchuan.dlnatest.data.MediaItem;
@@ -16,7 +19,14 @@ import org.cybergarage.upnp.std.av.server.object.item.ItemNode;
 import org.cybergarage.upnp.std.av.server.object.item.ResourceNode;
 import org.cybergarage.xml.Attribute;
 import org.cybergarage.xml.AttributeList;
+import org.cybergarage.xml.Node;
+import org.cybergarage.xml.Parser;
+import org.cybergarage.xml.ParserException;
 
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.Hashtable;
@@ -51,6 +61,10 @@ public class DLNAUtil {
 	public static String getMimeType(String url){
 		String mime = null;
 		int dot = url.lastIndexOf( '.' );
+		if (url.contains(".m3u8")){
+			mime = "video/mp4";
+			return mime;
+		}
 		if ( dot >= 0 )
 			mime = (String)theMimeTypes.get( url.substring( dot + 1 ).toLowerCase());
 		if ( mime == null )
@@ -90,6 +104,31 @@ public class DLNAUtil {
 		itemNode.setResource(getUrl(dir),protocolinfo,attributeList);
 		didlLite.addContentNode(itemNode);
 		return didlLite.toString();
+	}
+
+	public static ItemNode parseMetaData(String didl){
+		Node node = null;
+		didl = didl.replaceAll("&","&amp;");
+		Parser parser = org.cybergarage.upnp.UPnP.getXMLParser();
+		try {
+			node = parser.parse(didl);
+		} catch (ParserException e) {
+			e.printStackTrace();
+			return null;
+		}
+		if ( node != null) {
+			Log.i("DLNAUtil","node != null");
+			node =  node.getNode(ItemNode.NAME);
+			if (ItemNode.isItemNode(node)){
+				ContentNode contentNode = new ItemNode();
+				contentNode.set(node);
+				if (contentNode.isItemNode()) {
+					Log.i("DLNAUtil", "node isItemNode");
+					return (ItemNode) contentNode;
+				}
+			}
+		}
+		return null;
 	}
 
 	public static Hashtable<String, String> theMimeTypes = new Hashtable<String, String>();
@@ -167,5 +206,27 @@ public class DLNAUtil {
 			slant = 0;
 		String title = url.substring(slant, idx);
 		return title;
+	}
+	public static File getFileFromBytes(String name,String path) {
+		byte[] b=name.getBytes();
+		BufferedOutputStream stream = null;
+		File file = null;
+		try {
+			file = new File(Environment.getExternalStorageDirectory()+path);
+			FileOutputStream fstream = new FileOutputStream(file);
+			stream = new BufferedOutputStream(fstream);
+			stream.write(b);
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			if (stream != null) {
+				try {
+					stream.close();
+				} catch (IOException e1) {
+					e1.printStackTrace();
+				}
+			}
+		}
+		return file;
 	}
 }

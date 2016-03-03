@@ -48,6 +48,8 @@ public class MediaServer extends Device
 	////////////////////////////////////////////////
 	
 	public final static String DEVICE_TYPE = "urn:schemas-upnp-org:device:MediaServer:1";
+
+	private HttpServer mHttpServer;
 	
 	public final static int DEFAULT_HTTP_PORT = 38520;
 	
@@ -153,8 +155,9 @@ public class MediaServer extends Device
 		servConMan.setQueryListener(getConnectionManager());
 
 		try {
-			HttpServer httpServer = new HttpServer(DEFAULT_HTTP_PORT);
-			httpServer.setContentDirectory(getContentDirectory());
+			mHttpServer = new HttpServer(DEFAULT_HTTP_PORT);
+			mHttpServer.setContentDirectory(getContentDirectory());
+
 		} catch (IOException e) {
 			e.printStackTrace();
 			Log.i("error","Couldn't start server");
@@ -296,6 +299,7 @@ public class MediaServer extends Device
 	public boolean stop()
 	{
 		getContentDirectory().stop();
+		mHttpServer.stop();
 		super.stop();
 		return true;
 	}

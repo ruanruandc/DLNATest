@@ -929,6 +929,7 @@ public class RenderingControl implements ActionListener, QueryListener
 		}
 		if (actionName.equals(GETVOLUME)){
 			Log.i("renderControl",GETVOLUME+"");
+			isActionSuccess = true;
 		}
 //		MediaRenderer dmr = getMediaRenderer();
 //		if (dmr != null) {

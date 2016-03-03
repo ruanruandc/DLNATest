@@ -5,6 +5,7 @@ import com.meizu.ruandongchuan.dlnatest.util.DLNAUtil;
 import com.meizu.ruandongchuan.dlnatest.util.LogUtil;
 
 import org.cybergarage.upnp.Device;
+import org.cybergarage.upnp.std.av.controller.MediaController;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,10 +14,20 @@ public class ControlPointContainer {
 	private List<Device> mDevices;
 	private Device mSelectedDevice;
 	private DeviceChangeListener mDeviceChangeListener;
+	private MediaController mControlPoint;
+	private Device mSelectServer;
 	private static final ControlPointContainer mDLNAContainer = new ControlPointContainer();
 
 	private ControlPointContainer() {
 		mDevices = new ArrayList<Device>();
+	}
+
+	public void setmControlPoint(MediaController mControlPoint) {
+		this.mControlPoint = mControlPoint;
+	}
+
+	public MediaController getmControlPoint() {
+		return mControlPoint;
 	}
 
 	public static ControlPointContainer getInstance() {
@@ -52,7 +63,7 @@ public class ControlPointContainer {
 			String udnString = mDevices.get(i).getUDN();
 			if (d.getUDN().equalsIgnoreCase(udnString)) {
 				Device device = mDevices.remove(i);
-				LogUtil.d("removeDevice","Devices remove a device");
+				LogUtil.d("removeDevice","Devices remove a device "+device.getFriendlyName());
 
 				if (mSelectedDevice != null && 
 					mSelectedDevice.getUDN().equalsIgnoreCase(device.getUDN())) {
@@ -84,6 +95,14 @@ public class ControlPointContainer {
 
 	public void setSelectedDevice(Device mSelectedDevice) {
 		this.mSelectedDevice = mSelectedDevice;
+	}
+
+	public void setmSelectServer(Device mSelectServer) {
+		this.mSelectServer = mSelectServer;
+	}
+
+	public Device getmSelectServer() {
+		return mSelectServer;
 	}
 
 	public void setDeviceChangeListener(

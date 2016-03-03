@@ -94,10 +94,14 @@ public class HttpServer
 		
 		if (newUri != null) uri = newUri;
 		Log.i("uri=",uri);*/
+		try {
+			uri = new String(uri.getBytes("ISO-8859-1"),"UTF-8");
+		} catch (UnsupportedEncodingException e1) {
+			e1.printStackTrace();
+		}
 		Log.i("uri=",uri);
 		String fromUrl  = "";
 		if (uri.startsWith(ContentDirectory.CONTENT_EXPORT_URI)) {
-			String[] urls = uri.split("id=");
 			String itemId = parms.getProperty("id");
 			ContentNode itemNode = getContentDirectory().findContentNodeByID(itemId);
 			Log.i(tag,"itemid = "+itemId);

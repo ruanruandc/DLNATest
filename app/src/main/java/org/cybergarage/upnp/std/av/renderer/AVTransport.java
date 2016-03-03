@@ -115,6 +115,8 @@ public class AVTransport implements ActionListener, QueryListener
 
 	public final static String STOPPED = "STOPPED";
 	public final static String PLAYING = "PLAYING";
+	public final static String TRANSITIONING = "TRANSITIONING";
+
 	public final static String OK = "OK";
 	public final static String ERROR_OCCURRED = "ERROR_OCCURRED";
 	public final static String NORMAL = "NORMAL";
@@ -655,7 +657,14 @@ public class AVTransport implements ActionListener, QueryListener
 		"            </argumentList>"+
 		"        </action>"+
 		"    </actionList>"+
-		"</scpd>";	
+		"</scpd>";
+
+
+
+	///////////////////////
+	// Customer
+	///////////////////////
+	private String mCurPlayState = STOPPED;
 
 	////////////////////////////////////////////////
 	// Constructor 
@@ -786,6 +795,8 @@ public class AVTransport implements ActionListener, QueryListener
 			avTransInfo.setURIMetaData(currentMetaData);
 			setCurrentAvTransInfo(avTransInfo);
 			isActionSuccess = true;
+
+			this.mCurPlayState = STOPPED;
 			Log.i(CURRENTURI,currentUri);
 			Log.i(CURRENTURIMETADATA, currentMetaData);
 			//DLNAService.getInstance().play(avTransInfo.getURI(), avTransInfo.getURIMetaData());
@@ -822,7 +833,11 @@ public class AVTransport implements ActionListener, QueryListener
 		if (actionName.equals(PLAY)) {
 			int instanceID = action.getArgument(INSTANCEID).getIntegerValue();
 			int speed = action.getArgument(SPEED).getIntegerValue();
+			if (speed == 1){
+				this.mCurPlayState = TRANSITIONING;
+			}
 			DLNAService.getInstance().play(getCurrentAvTransInfo().getURI(), getCurrentAvTransInfo().getURIMetaData());
+
 			//action.getArgument(SPEED).getRelatedStateVariable().setValue(speed);
 			/*synchronized (avTransInfoList) {
 				AVTransportInfo avTransInfo = getCurrentAvTransInfo();
@@ -845,11 +860,14 @@ public class AVTransport implements ActionListener, QueryListener
 					isActionSuccess = true;
 				}
 			}*/
+			this.mCurPlayState = PLAYING;
 			isActionSuccess = true;
 		}
 
 		if (actionName.equals(STOP)) {
 			int instanceID = action.getArgument(INSTANCEID).getIntegerValue();
+			//change play state
+			this.mCurPlayState = STOPPED;
 			isActionSuccess = true;
 		}
 
@@ -911,7 +929,8 @@ public class AVTransport implements ActionListener, QueryListener
 
 			// if(action.getArgument("InstanceID").getValue().equals("1")){
 			//action.getArgument(CURRENTTRANSPORTSTATE).setValue(PLAYING);
-			action.getArgument(CURRENTTRANSPORTSTATE).setValue(STOPPED);
+			//action.getArgument(CURRENTTRANSPORTSTATE).setValue(STOPPED);
+			action.getArgument(CURRENTTRANSPORTSTATE).setValue(this.mCurPlayState);
 			action.getArgument(CURRENTTRANSPORTSTATUS).setValue(OK);
 			action.getArgument(CURRENTSPEED).setValue("1");
 			// }

@@ -7,7 +7,7 @@ import android.widget.Toast;
 import com.meizu.ruandongchuan.dlnatest.data.event.EventMain;
 import com.meizu.ruandongchuan.dlnatest.util.DLNAUtil;
 import com.meizu.ruandongchuan.dlnatest.view.DlnaApp;
-import com.meizu.ruandongchuan.dlnatest.view.MainActivity;
+import com.meizu.ruandongchuan.dlnatest.view.activity.MainActivity;
 
 import java.util.Timer;
 import java.util.TimerTask;

@@ -19,6 +19,8 @@
 
 package org.cybergarage.upnp.std.av.server.object;
 
+import android.util.Log;
+
 import org.cybergarage.upnp.std.av.server.ContentDirectory;
 import org.cybergarage.upnp.std.av.server.DC;
 import org.cybergarage.upnp.std.av.server.MediaServer;
@@ -384,6 +386,7 @@ public abstract class ContentNode extends Node
 		String upnpClass = getUPnPClass();
 		if (upnpClass == null)
 			return false;
+		Log.i("upnpClass",upnpClass);
 		return upnpClass.startsWith(targetClass); 
 	}
 	

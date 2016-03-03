@@ -17,7 +17,7 @@ import com.meizu.ruandongchuan.dlnatest.data.event.EventMain;
 import com.meizu.ruandongchuan.dlnatest.engine.ControlPointContainer;
 import com.meizu.ruandongchuan.dlnatest.engine.LocalController;
 import com.meizu.ruandongchuan.dlnatest.util.DLNAUtil;
-import com.meizu.ruandongchuan.dlnatest.view.MainActivity;
+import com.meizu.ruandongchuan.dlnatest.view.activity.MainActivity;
 import com.meizu.ruandongchuan.dlnatest.view.adapter.ImageAdapter;
 
 import java.util.ArrayList;
@@ -92,6 +92,7 @@ public class ImageFragment extends Fragment implements AdapterView.OnItemClickLi
             EventBus.getDefault().post(new EventMain(MainActivity.EVENT_SHOW));
         }else {
             play(mImages.get(position).getDirectory(), DLNAUtil.getMetaData(mImages.get(position)));
+            //play("http://192.168.1.127:38520/ExportContent?id=105", "");
         }
     }
 

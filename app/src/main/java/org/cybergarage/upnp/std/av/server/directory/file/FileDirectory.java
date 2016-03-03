@@ -90,21 +90,36 @@ public class FileDirectory extends Directory
 		
 		// File/TimeStamp
 		itemNode.setFile(file);
-		
-		// Title
-		String title = formatObj.getTitle();
-		if (0 < title.length())
-			itemNode.setTitle(title.replaceAll("&", "&amp;"));
-			
-		// Creator
-		String creator = formatObj.getCreator();
-		if (0 < creator.length())
-			itemNode.setCreator(creator);
 
 		// Media Class
 		String mediaClass = format.getMediaClass();
 		if (0 < mediaClass.length())
 			itemNode.setUPnPClass(mediaClass);
+		
+		// Title
+		String title = formatObj.getTitle();
+
+		if (0 < title.length()) {
+
+		}else {
+			title = file.getName();
+			//itemNode.setTitle(title);
+		}
+		title = title.replaceAll("<","&lt;");
+		title = title.replaceAll(">","&gt;");
+		title = title.replaceAll("&","&amp;");
+		itemNode.setTitle(title);
+		Log.i("FileDirectory","title="+title);
+		// Creator
+		String creator = formatObj.getCreator();
+		if (0 < creator.length()) {
+			creator = creator.replaceAll("&","&amp;");
+			creator = creator.replaceAll("<","&lt;");
+			creator = creator.replaceAll(">","&gt;");
+			itemNode.setCreator(creator);
+		}
+
+
 
 		// Date
 		long lastModTime = file.lastModified();

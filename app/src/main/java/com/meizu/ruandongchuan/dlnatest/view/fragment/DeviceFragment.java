@@ -1,6 +1,7 @@
 package com.meizu.ruandongchuan.dlnatest.view.fragment;
 
 import android.app.Dialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
@@ -16,6 +17,7 @@ import android.widget.ListView;
 import com.meizu.ruandongchuan.dlnatest.R;
 import com.meizu.ruandongchuan.dlnatest.engine.ControlPointContainer;
 import com.meizu.ruandongchuan.dlnatest.util.DLNAUtil;
+import com.meizu.ruandongchuan.dlnatest.view.activity.FileActivity;
 
 import org.cybergarage.upnp.Device;
 
@@ -47,6 +49,7 @@ public class DeviceFragment extends DialogFragment{
         if (mSelected < 0)
             return;
         mLvRenderer.setItemChecked(mSelected, true);
+
     }
 
     @NonNull
@@ -67,6 +70,18 @@ public class DeviceFragment extends DialogFragment{
                 dismiss();
             }
         });
+        mLvServer.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Intent intent = new Intent(getContext(), FileActivity.class);
+                Device device = mServerDevices.get(position);
+                ControlPointContainer.getInstance().setmSelectServer(device);
+                //intent.putExtra("name",mServerDevices.get(position).getFriendlyName());
+                getActivity().startActivity(intent);
+                dismiss();
+            }
+        });
+
         AlertDialog dialog = new AlertDialog.Builder(getContext())
                 .setView(view)
                 .setTitle("设备列表")

@@ -1,4 +1,4 @@
-package com.meizu.ruandongchuan.dlnatest.view;
+package com.meizu.ruandongchuan.dlnatest.view.activity;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;

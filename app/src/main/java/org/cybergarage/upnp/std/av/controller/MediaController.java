@@ -16,6 +16,8 @@
 
 package org.cybergarage.upnp.std.av.controller;
 
+import android.util.Log;
+
 import org.cybergarage.upnp.Action;
 import org.cybergarage.upnp.Argument;
 import org.cybergarage.upnp.ControlPoint;
@@ -162,10 +164,20 @@ public class MediaController extends ControlPoint
 		if (resultArg == null)
 			return null;
 
-		String resultStr = resultArg.getValue();
+		final String resultStr = resultArg.getValue();
 		if (resultStr == null)
 			return null;
 
+		Log.i("resultStr=",resultStr);
+		//生成resultStr文件
+		/*new Thread(){
+			@Override
+			public void run() {
+				super.run();
+				DLNAUtil.getFileFromBytes(resultStr, "/result.txt");
+				Log.i("resultStr2File", "success");
+			}
+		}.start();*/
 		Node node = null;
 
 		Parser xmlParser = UPnP.getXMLParser();

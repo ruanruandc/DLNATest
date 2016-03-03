@@ -348,7 +348,16 @@ public class ControlPoint implements HTTPRequestListener
 		removeDevice(dev);
 	}
 
-	private void removeDevice(SSDPPacket packet)
+	/*private void removeDevice(SSDPPacket packet)
+	{
+		if (packet.isByeBye() == false)
+			return;
+		String usn = packet.getUSN();
+		String udn = USN.getUDN(usn);
+		removeDevice(udn);
+	}*/
+	// TODO: 3/2/16
+	private synchronized void removeDevice(SSDPPacket packet)
 	{
 		if (packet.isByeBye() == false)
 			return;

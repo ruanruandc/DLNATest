@@ -40,7 +40,9 @@ public class SearchThread extends Thread {
 				ControlPointContainer.getInstance().addDevice(dev);
 			}
 		};
-		this.mControlPoint.addDeviceChangeListener(mDeviceChangeListener);
+		if (mControlPoint != null) {
+			this.mControlPoint.addDeviceChangeListener(mDeviceChangeListener);
+		}
 	}
 
 	@Override

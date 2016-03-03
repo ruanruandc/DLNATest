@@ -395,7 +395,8 @@ public class ConnectionManager implements ActionListener, QueryListener
 				conIDs += ",";
 			conIDs += Integer.toString(info.getID());
 		}
-		action.getArgument(CONNECTIONIDS).setValue(conIDs);
+		//action.getArgument(CONNECTIONIDS).setValue(conIDs);
+		action.getArgument(CONNECTIONIDS).setValue("0");
 		unlock();
 		return true;
 	}
