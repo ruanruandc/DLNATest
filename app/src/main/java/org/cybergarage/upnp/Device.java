@@ -96,6 +96,8 @@
 
 package org.cybergarage.upnp;
 
+import android.util.Log;
+
 import org.cybergarage.http.HTTP;
 import org.cybergarage.http.HTTPRequest;
 import org.cybergarage.http.HTTPResponse;
@@ -1428,6 +1430,7 @@ public class Device implements org.cybergarage.http.HTTPRequestListener,
 	}
 
 	public void announce(String bindAddr) {
+		Log.i("Device:","announce("+bindAddr+")");
 		String devLocation = getLocationURL(bindAddr);
 
 		SSDPNotifySocket ssdpSock = new SSDPNotifySocket(bindAddr);
@@ -1479,6 +1482,7 @@ public class Device implements org.cybergarage.http.HTTPRequestListener,
 	}
 
 	public void announce() {
+		Log.i("Device:","announce()");
 		notifyWait();
 		InetAddress[] binds = getDeviceData().getHTTPBindAddress();
 		String[] bindAddresses;
@@ -1505,6 +1509,7 @@ public class Device implements org.cybergarage.http.HTTPRequestListener,
 	}
 
 	public void byebye(String bindAddr) {
+		Log.i("Device:","byebye("+bindAddr+")");
 		SSDPNotifySocket ssdpSock = new SSDPNotifySocket(bindAddr);
 
 		SSDPNotifyRequest ssdpReq = new SSDPNotifyRequest();
@@ -1545,7 +1550,7 @@ public class Device implements org.cybergarage.http.HTTPRequestListener,
 	}
 
 	public void byebye() {
-
+		Log.i("Device:","byebye("+")");
 		InetAddress[] binds = getDeviceData().getHTTPBindAddress();
 		String[] bindAddresses;
 		if (binds != null) {
@@ -2171,6 +2176,12 @@ public class Device implements org.cybergarage.http.HTTPRequestListener,
 	}
 
 	private boolean stop(boolean doByeBye) {
+		Advertiser adv = getAdvertiser();
+		if (adv != null) {
+			adv.stop();
+			setAdvertiser(null);
+		}
+
 		if (doByeBye == true)
 			byebye();
 
@@ -2184,11 +2195,7 @@ public class Device implements org.cybergarage.http.HTTPRequestListener,
 		ssdpSearchSockList.close();
 		ssdpSearchSockList.clear();
 
-		Advertiser adv = getAdvertiser();
-		if (adv != null) {
-			adv.stop();
-			setAdvertiser(null);
-		}
+
 
 		return true;
 	}

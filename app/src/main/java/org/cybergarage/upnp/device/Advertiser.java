@@ -17,6 +17,8 @@
 
 package org.cybergarage.upnp.device;
 
+import android.util.Log;
+
 import org.cybergarage.upnp.Device;
 import org.cybergarage.util.ThreadCore;
 
@@ -54,14 +56,18 @@ public class Advertiser extends ThreadCore
 	public void run() 
 	{
 		Device dev = getDevice();
+		//dev.byebye();
 		long leaseTime = dev.getLeaseTime();
 		long notifyInterval;
 		while (isRunnable() == true) {
 			notifyInterval = (leaseTime/4) + (long)((float)leaseTime * (Math.random() * 0.25f));
+			Log.i("notifyInterval=",notifyInterval+"");
 			notifyInterval *= 1000;
 			try {
 				Thread.sleep(notifyInterval);
-			} catch (InterruptedException e) {}
+			} catch (InterruptedException e) {
+
+			}
 			dev.announce();
 		}
 	}

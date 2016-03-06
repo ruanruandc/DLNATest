@@ -60,6 +60,10 @@ public class DLNAService extends Service {
         return mMediaServer;
     }
 
+    public MediaRenderer getmMediaRenderer() {
+        return mMediaRenderer;
+    }
+
     @Override
     public IBinder onBind(Intent intent) {
         return null;
@@ -106,9 +110,9 @@ public class DLNAService extends Service {
 
 
     private void unInit() {
-        //stopThread();
+        stopThread();
         stopMediaRenderer();
-        //stopMediaServer();
+        stopMediaServer();
         stopMultcastLock();
         //ControlPointContainer.getInstance().setmControlPoint(null);
         //ControlPointContainer.getInstance().getDevices().clear();
@@ -150,6 +154,10 @@ public class DLNAService extends Service {
     public void startMediaServer() {
         new Thread() {
             public void run() {
+
+                if (mMediaServer != null){
+                    mMediaServer.stop();
+                }
                 try {
                     mMediaServer = new MediaServer(getApplicationContext());
 
@@ -202,6 +210,9 @@ public class DLNAService extends Service {
         new Thread() {
             public void run() {
                 try {
+                    if (mMediaRenderer != null){
+                        mMediaRenderer.stop();
+                    }
                     mMediaRenderer = new MediaRenderer(getApplicationContext());
                     mMediaRenderer.setFriendlyName(DeviceUtil.getFriendlyName(getApplicationContext(),MediaRenderer.MEDIARENDERDER));
                     mMediaRenderer.start();
@@ -217,14 +228,9 @@ public class DLNAService extends Service {
      * stop DMR
      */
     public void stopMediaRenderer() {
-        /*if (null != mMediaRenderer) {
-            mMediaRenderer.stop();
-            mMediaRenderer = null;
-            Log.i(TAG,"stopMediaRenderer");
-        }*/
         new Thread() {
             public void run() {
-                if (null != mMediaRenderer) {
+                /*if (null != mMediaRenderer) {
                     boolean bl = mMediaRenderer.stop();
                     //mMediaRenderer.setFriendlyName("Test");
                     mMediaRenderer = null;
@@ -242,6 +248,11 @@ public class DLNAService extends Service {
                     mMediaServer.stop();
                     mMediaServer = null;
                     Log.i(TAG, "stopMediaServer");
+                }*/
+                if (null != mMediaRenderer) {
+                    mMediaRenderer.stop();
+                    mMediaRenderer = null;
+                    Log.i(TAG,"stopMediaRenderer");
                 }
             }
         }.start();

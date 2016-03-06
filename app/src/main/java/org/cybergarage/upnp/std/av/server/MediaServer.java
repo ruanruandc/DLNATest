@@ -141,7 +141,7 @@ public class MediaServer extends Device
 		UPnP.setEnable(UPnP.USE_ONLY_IPV4_ADDR);
 		String firstIf = HostInterface.getHostAddress(0);
 		setInterfaceAddress(firstIf);
-		setHTTPPort(DEFAULT_HTTP_PORT);
+		//setHTTPPort(DEFAULT_HTTP_PORT);
 
 		conDir = new ContentDirectory(this);
 		conMan = new ConnectionManager(this);
@@ -154,14 +154,7 @@ public class MediaServer extends Device
 		servConMan.setActionListener(getConnectionManager());
 		servConMan.setQueryListener(getConnectionManager());
 
-		try {
-			mHttpServer = new HttpServer(DEFAULT_HTTP_PORT);
-			mHttpServer.setContentDirectory(getContentDirectory());
 
-		} catch (IOException e) {
-			e.printStackTrace();
-			Log.i("error","Couldn't start server");
-		}
 	}
 	
 	protected void finalize()
@@ -292,6 +285,17 @@ public class MediaServer extends Device
 	public boolean start()
 	{
 		getContentDirectory().start();
+		try {
+			if (mHttpServer != null){
+				mHttpServer.stop();
+			}
+			mHttpServer = new HttpServer(DEFAULT_HTTP_PORT);
+			mHttpServer.setContentDirectory(getContentDirectory());
+			Log.i("mHttpServer", "start server success");
+		} catch (IOException e) {
+			e.printStackTrace();
+			Log.i("error","Couldn't start server");
+		}
 		super.start();
 		return true;
 	}
@@ -299,7 +303,9 @@ public class MediaServer extends Device
 	public boolean stop()
 	{
 		getContentDirectory().stop();
-		mHttpServer.stop();
+		if (mHttpServer != null) {
+			mHttpServer.stop();
+		}
 		super.stop();
 		return true;
 	}

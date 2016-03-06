@@ -18,6 +18,8 @@
 
 package org.cybergarage.util;
 
+import android.util.Log;
+
 public class ThreadCore implements Runnable
 {
 	////////////////////////////////////////////////
@@ -58,20 +60,28 @@ public class ThreadCore implements Runnable
 
 	public boolean isRunnable()
 	{
-		return (Thread.currentThread() == getThreadObject()) ? true : false;
+		boolean result = (Thread.currentThread() == getThreadObject()) ? true : false;
+		Log.i("ThreadCore=",result+"");
+		return result;
 	}
 	
 	public void stop() 
 	{
-		java.lang.Thread threadObject = getThreadObject();
+		/*java.lang.Thread threadObject = getThreadObject();
 		if (threadObject != null) { 
 			//threadObject.destroy();
 			//threadObject.stop();
-			
+			setThreadObject(null);
 			// Thanks for Kazuyuki Shudo (08/23/07)
 			threadObject.interrupt();
 			
-			setThreadObject(null);
+
+		}*/
+		Thread tmpThread = this.getThreadObject();
+		Thread threadObject = this.getThreadObject();
+		if(threadObject != null) {
+			this.setThreadObject(null);
+			tmpThread.interrupt();
 		}
 	}
 	

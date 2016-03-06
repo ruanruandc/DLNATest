@@ -75,7 +75,7 @@ public class DLNAUtil {
 	public static String getMetaData(MediaItem item){
 		DIDLLiteNode didlLite = new DIDLLiteNode();
 		ItemNode itemNode = new ItemNode();
-		itemNode.setUPnPClass(UPnP.OBJECT_ITEM_VIDEOITEM);
+
 		String dir = "";
 		String size = "";
 		String title = "";
@@ -84,16 +84,19 @@ public class DLNAUtil {
 			dir = ((Audio) item).getPath();
 			size = String.valueOf(((Audio) item).getSize());
 			title= ((Audio) item).getTilte();
+			itemNode.setUPnPClass(UPnP.OBJECT_ITEM_AUDIOITEM);
 		}else if (item instanceof Image){
 			itemNode.setID(((Image) item).getId());
 			dir = ((Image) item).getDirectory();
 			size = String.valueOf(((Image) item).getSize());
 			title = ((Image) item).getTitle();
+			itemNode.setUPnPClass(UPnP.OBJECT_ITEM_IMAGEITEM_PHOTO);
 		}else if (item instanceof Video){
 			itemNode.setID(((Video) item).getId());
 			dir = ((Video) item).getDirectory();
 			size = String.valueOf(((Video) item).getSize());
 			title = ((Video) item).getTitle();
+			itemNode.setUPnPClass(UPnP.OBJECT_ITEM_VIDEOITEM_MOVIE);
 		}
 		itemNode.setTitle(title);
 		String protocolinfo = "http-get:*:"+

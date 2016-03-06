@@ -2,13 +2,20 @@ package com.meizu.ruandongchuan.dlnatest.view.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.NavigationView;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.WindowManager;
+import android.widget.CompoundButton;
+import android.widget.Switch;
 
 import com.meizu.ruandongchuan.dlnatest.R;
 import com.meizu.ruandongchuan.dlnatest.data.event.EventBrightness;
@@ -35,12 +42,16 @@ public class MainActivity extends BaseActivity{
     //private DeviceFragment mDeviceFragment;
     private TabLayout mTabLayout;
     private ViewPager mViewPager;
+    private DrawerLayout mDrawer;
+    private Toolbar toolbar;
+    private NavigationView mNavigationView;
+    private Switch mSwitchDmr,mSwitchDms;
     //private WifiBroadcast mWifiStateReceiver;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setContentView(R.layout.activity_main_drawer);
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         initView();
         initData();
@@ -86,7 +97,7 @@ public class MainActivity extends BaseActivity{
     @Override
     protected void onDestroy() {
         Log.i(TAG,"onDestroy");
-        //stopDLNAService();
+        stopDLNAService();
         EventBus.getDefault().unregister(this);
         super.onDestroy();
         //unregisterWifiStateReceiver();
@@ -95,6 +106,64 @@ public class MainActivity extends BaseActivity{
     private void initView(){
         mTabLayout = (TabLayout) findViewById(R.id.tab_main);
         mViewPager = (ViewPager) findViewById(R.id.vp_main);
+        //初始化抽屉与侧滑导航栏
+        mDrawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, mDrawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        mDrawer.setDrawerListener(toggle);
+        toggle.syncState();
+        mNavigationView = (NavigationView) findViewById(R.id.nav_view);
+        View navi_view = LayoutInflater.from(this).inflate(R.layout.navi_layout,mNavigationView,false);
+        mNavigationView.addView(navi_view);
+        mSwitchDmr = (Switch) navi_view.findViewById(R.id.switch_dmr);
+        mSwitchDms = (Switch) navi_view.findViewById(R.id.switch_dms);
+        mDrawer.setDrawerListener(new DrawerLayout.DrawerListener() {
+            @Override
+            public void onDrawerSlide(View drawerView, float slideOffset) {
+
+            }
+
+            @Override
+            public void onDrawerOpened(View drawerView) {
+                if (DLNAService.getInstance().getmMediaRenderer() != null) {
+
+                    mSwitchDmr.setChecked(DLNAService.getInstance().getmMediaRenderer().isRunning());
+                }
+                if (DLNAService.getInstance().getmMediaServer() != null){
+                    mSwitchDms.setChecked(DLNAService.getInstance().getmMediaServer().isRunning());
+                }
+            }
+
+            @Override
+            public void onDrawerClosed(View drawerView) {
+
+            }
+
+            @Override
+            public void onDrawerStateChanged(int newState) {
+
+            }
+        });
+        mSwitchDmr.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    DLNAService.getInstance().startMediaRenderer();
+                } else {
+                    DLNAService.getInstance().stopMediaRenderer();
+                }
+            }
+        });
+        mSwitchDms.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    DLNAService.getInstance().startMediaServer();
+                } else {
+                    DLNAService.getInstance().stopMediaServer();
+                }
+            }
+        });
     }
 
     private void initData(){
