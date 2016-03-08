@@ -98,7 +98,7 @@ public class MainActivity extends BaseActivity{
     @Override
     protected void onDestroy() {
         Log.i(TAG,"onDestroy");
-        stopDLNAService();
+        //stopDLNAService();
         EventBus.getDefault().unregister(this);
         super.onDestroy();
         //unregisterWifiStateReceiver();

@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.net.wifi.WifiManager;
+import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
 
@@ -17,6 +18,7 @@ import com.meizu.ruandongchuan.dlnatest.engine.SearchThread;
 import com.meizu.ruandongchuan.dlnatest.util.DLNAUtil;
 import com.meizu.ruandongchuan.dlnatest.util.LogUtil;
 import com.meizu.ruandongchuan.dlnatest.view.activity.FullscreenActivity;
+import com.meizu.ruandongchuan.dlnatest.view.activity.VideoActivity;
 import com.meizu.ruandongchuan.dlnatest.view.fragment.DeviceFragment;
 
 import org.cybergarage.upnp.Device;
@@ -51,6 +53,7 @@ public class DLNAService extends Service {
     private static DLNAService mService;
     private WifiManager.MulticastLock mMulticastLock;
     private DeviceFragment mDeviceFragment;
+    private DLNABinder mDlnaBinder;
 
     public static DLNAService getInstance() {
         return mService;
@@ -66,13 +69,14 @@ public class DLNAService extends Service {
 
     @Override
     public IBinder onBind(Intent intent) {
-        return null;
+
+        return mDlnaBinder;
     }
 
     @Override
     public void onCreate() {
         super.onCreate();
-        Log.i("DLNAService","onCreate");
+        Log.i("DLNAService", "onCreate");
         init();
     }
 
@@ -97,15 +101,18 @@ public class DLNAService extends Service {
         mSearchThread = new SearchThread(mControlPoint);
         mDeviceFragment = new DeviceFragment();
         ControlPointContainer.getInstance().setmControlPoint(mControlPoint);
+        mDlnaBinder = new DLNABinder();
         //registerWifiStateReceiver();
     }
 
     private void start() {
         startMultcastLock();
-        startThread();
         startMediaRenderer();
-        startMediaServer();
         startControlPoint();
+        startThread();
+
+        //startMediaServer();
+
     }
 
 
@@ -113,6 +120,7 @@ public class DLNAService extends Service {
         stopThread();
         stopMediaRenderer();
         stopMediaServer();
+        //stopControlPoint();
         stopMultcastLock();
         //ControlPointContainer.getInstance().setmControlPoint(null);
         //ControlPointContainer.getInstance().getDevices().clear();
@@ -140,9 +148,24 @@ public class DLNAService extends Service {
             @Override
             public void run() {
                 super.run();
-                if (mControlPoint != null) {
+                if (mControlPoint == null) {
+                    mControlPoint = new MediaController();
+                    mControlPoint.setNMPRMode(true);
                     mControlPoint.search();
-                    Log.i(TAG, "startControlPoint");
+                }
+                Log.i(TAG, "startControlPoint");
+            }
+        }.start();
+    }
+
+    public void stopControlPoint(){
+        new Thread(){
+            @Override
+            public void run() {
+                super.run();
+                if (mControlPoint != null) {
+                    mControlPoint.stop();
+                    Log.i(TAG, "stopControlPoint");
                 }
             }
         }.start();
@@ -194,7 +217,7 @@ public class DLNAService extends Service {
     public void stopMediaServer() {
         new Thread() {
             public void run() {
-                if (null != mMediaServer) {
+                if (null != mMediaServer && mMediaRenderer.isRunning()) {
                     mMediaServer.stop();
                     mMediaServer = null;
                     Log.i(TAG, "stopMediaServer");
@@ -209,17 +232,10 @@ public class DLNAService extends Service {
     public void startMediaRenderer() {
         new Thread() {
             public void run() {
-                try {
-                    if (mMediaRenderer != null){
-                        mMediaRenderer.stop();
-                    }
-                    mMediaRenderer = new MediaRenderer(getApplicationContext());
-                    mMediaRenderer.setFriendlyName(DeviceUtil.getFriendlyName(getApplicationContext(),MediaRenderer.MEDIARENDERDER));
-                    mMediaRenderer.start();
-                    Log.i(TAG, "startMediaRenderer ");
-                } catch (InvalidDescriptionException e) {
-                    e.printStackTrace();
-                }
+                mMediaRenderer = new MediaRenderer();
+                mMediaRenderer.setFriendlyName(DeviceUtil.getFriendlyName(getApplicationContext(),MediaRenderer.MEDIARENDERDER));
+                mMediaRenderer.start();
+                Log.i(TAG, "startMediaRenderer ");
             }
         }.start();
     }
@@ -251,7 +267,6 @@ public class DLNAService extends Service {
                 }*/
                 if (null != mMediaRenderer) {
                     mMediaRenderer.stop();
-                    mMediaRenderer = null;
                     Log.i(TAG,"stopMediaRenderer");
                 }
             }
@@ -283,11 +298,15 @@ public class DLNAService extends Service {
     public void stopThread() {
         if (mSearchThread != null) {
             mSearchThread.stopThread();
-            mControlPoint.stop();
             mSearchThread = null;
-            mControlPoint = null;
         }
         LogUtil.w(TAG, "stopThread");
+    }
+
+    public class DLNABinder extends Binder{
+        public DLNAService getService(){
+            return DLNAService.this;
+        }
     }
 
     /*private void registerWifiStateReceiver() {
@@ -354,6 +373,7 @@ public class DLNAService extends Service {
         if (itemNode != null){
             if ( itemNode.isAudioClass() ) {
                 type = "audio/*";
+                intent.setClass(getApplicationContext(), VideoActivity.class);
             }else
             if ( itemNode.isImageClass() ) {
                 type = "image/*";
@@ -361,6 +381,7 @@ public class DLNAService extends Service {
             }else
             if ( itemNode.isMovieClass() ){
                 type = "video/*";
+                intent.setClass(getApplicationContext(), VideoActivity.class);
             }
         }
         //intent.setData(uri);

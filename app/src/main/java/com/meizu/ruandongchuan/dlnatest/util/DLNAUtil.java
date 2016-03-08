@@ -232,4 +232,42 @@ public class DLNAUtil {
 		}
 		return file;
 	}
+	public static String timeFormatToString(int relTime) {
+		StringBuffer timeBuf = new StringBuffer();
+		relTime /= 1000;
+		int time = relTime / 3600;
+		if(time >= 10) {
+			timeBuf.append(time);
+		} else {
+			timeBuf.append("0").append(time);
+		}
+
+		relTime %= 3600;
+		time = relTime / 60;
+		if(time >= 10) {
+			timeBuf.append(":").append(time);
+		} else {
+			timeBuf.append(":0").append(time);
+		}
+
+		time = relTime % 60;
+		if(time >= 10) {
+			timeBuf.append(":").append(time);
+		} else {
+			timeBuf.append(":0").append(time);
+		}
+
+		return timeBuf.toString();
+	}
+
+	public static int parseTimeStringToMSecs ( String time ) {
+		String[] str = time.split ( ":|\\." );
+		if ( str.length < 3 )
+		{ return 0; }
+		int hour = Integer.parseInt ( str[0] );
+		int min = Integer.parseInt ( str[1] );
+		int sec = Integer.parseInt ( str[2] );
+		Log.i("DLNAUtil", "***********parseTimeStringToInt: " + hour + ":" + min + ":" + sec);
+		return ( hour * 3600 + min * 60 + sec ) * 1000;
+	}
 }
