@@ -232,7 +232,11 @@ public class DLNAService extends Service {
     public void startMediaRenderer() {
         new Thread() {
             public void run() {
-                mMediaRenderer = new MediaRenderer();
+                try {
+                    mMediaRenderer = new MediaRenderer(getApplicationContext());
+                } catch (InvalidDescriptionException e) {
+                    e.printStackTrace();
+                }
                 mMediaRenderer.setFriendlyName(DeviceUtil.getFriendlyName(getApplicationContext(),MediaRenderer.MEDIARENDERDER));
                 mMediaRenderer.start();
                 Log.i(TAG, "startMediaRenderer ");
