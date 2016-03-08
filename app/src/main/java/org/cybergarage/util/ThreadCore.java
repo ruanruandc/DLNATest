@@ -60,7 +60,7 @@ public class ThreadCore implements Runnable
 
 	public boolean isRunnable()
 	{
-		boolean result = (Thread.currentThread() == getThreadObject()) ? true : false;
+		boolean result = (Thread.currentThread() == getThreadObject());
 		Log.i("ThreadCore=",result+"");
 		return result;
 	}

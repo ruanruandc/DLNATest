@@ -997,7 +997,7 @@ public class AVTransport implements ActionListener, QueryListener
 				return false;
 			}
 
-			if(!this.mCurPlayState.equals("STOPPED")) {
+			if(!this.mCurPlayState.equals(STOPPED)) {
 				Message msg = Message.obtain();
 				msg.what = HandlerController.SEEK;
 				Bundle bundle = new Bundle();

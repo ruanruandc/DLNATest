@@ -250,25 +250,6 @@ public class DLNAService extends Service {
     public void stopMediaRenderer() {
         new Thread() {
             public void run() {
-                /*if (null != mMediaRenderer) {
-                    boolean bl = mMediaRenderer.stop();
-                    //mMediaRenderer.setFriendlyName("Test");
-                    mMediaRenderer = null;
-                    Log.i(TAG,"stopMediaRenderer"+bl);
-                }
-                if (mSearchThread != null) {
-                    mSearchThread.stopThread();
-                    mControlPoint.stop();
-                    mSearchThread = null;
-                    mControlPoint = null;
-                    LogUtil.w(TAG, "stopThread");
-                }
-
-                if (null != mMediaServer) {
-                    mMediaServer.stop();
-                    mMediaServer = null;
-                    Log.i(TAG, "stopMediaServer");
-                }*/
                 if (null != mMediaRenderer) {
                     mMediaRenderer.stop();
                     Log.i(TAG,"stopMediaRenderer");
