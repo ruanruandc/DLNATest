@@ -56,7 +56,7 @@ public class Advertiser extends ThreadCore
 	public void run() 
 	{
 		Device dev = getDevice();
-		dev.byebye();
+		//dev.byebye();
 		long leaseTime = dev.getLeaseTime();
 		long notifyInterval;
 		while (isRunnable() == true) {
