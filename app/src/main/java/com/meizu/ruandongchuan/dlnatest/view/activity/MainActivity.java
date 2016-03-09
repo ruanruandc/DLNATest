@@ -128,12 +128,31 @@ public class MainActivity extends BaseActivity{
             public void onDrawerOpened(View drawerView) {
                 mDrawer.requestFocus();
                 if (DLNAService.getInstance().getmMediaRenderer() != null) {
-
                     mSwitchDmr.setChecked(DLNAService.getInstance().getmMediaRenderer().isRunning());
                 }
-                if (DLNAService.getInstance().getmMediaServer() != null){
+                if (DLNAService.getInstance().getmMediaServer() != null) {
                     mSwitchDms.setChecked(DLNAService.getInstance().getmMediaServer().isRunning());
                 }
+                mSwitchDmr.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                    @Override
+                    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                        if (isChecked) {
+                            DLNAService.getInstance().startMediaRenderer();
+                        } else {
+                            DLNAService.getInstance().stopMediaRenderer();
+                        }
+                    }
+                });
+                mSwitchDms.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                    @Override
+                    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                        if (isChecked) {
+                            DLNAService.getInstance().startMediaServer();
+                        } else {
+                            DLNAService.getInstance().stopMediaServer();
+                        }
+                    }
+                });
             }
 
             @Override
@@ -146,26 +165,7 @@ public class MainActivity extends BaseActivity{
 
             }
         });
-        mSwitchDmr.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked) {
-                    DLNAService.getInstance().startMediaRenderer();
-                } else {
-                    DLNAService.getInstance().stopMediaRenderer();
-                }
-            }
-        });
-        mSwitchDms.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked) {
-                    DLNAService.getInstance().startMediaServer();
-                } else {
-                    DLNAService.getInstance().stopMediaServer();
-                }
-            }
-        });
+
     }
 
     private void initData(){

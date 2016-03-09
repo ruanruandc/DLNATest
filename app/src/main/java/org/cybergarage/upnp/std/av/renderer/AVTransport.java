@@ -791,6 +791,7 @@ public class AVTransport implements ActionListener, QueryListener
 	public void updatePositionInfo(String position,String duration){
 		this.mRelativeTimePosition = position;
 		this.mCurTrackDuration = duration;
+		Log.i("updatePositionInfo", "mCurTrackDuration=" + duration + "mRelativeTimePosition=" + mRelativeTimePosition);
 	}
 
 	public void setStateVariable(String ServiceId, String value) {

@@ -217,7 +217,7 @@ public class DLNAService extends Service {
     public void stopMediaServer() {
         new Thread() {
             public void run() {
-                if (null != mMediaServer && mMediaRenderer.isRunning()) {
+                if (null != mMediaServer && mMediaServer.isRunning()) {
                     mMediaServer.stop();
                     mMediaServer = null;
                     Log.i(TAG, "stopMediaServer");
