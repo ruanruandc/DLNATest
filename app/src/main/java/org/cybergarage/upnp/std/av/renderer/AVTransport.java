@@ -16,14 +16,24 @@
 package org.cybergarage.upnp.std.av.renderer;
 
 
+import android.content.Intent;
+import android.net.Uri;
+import android.os.Bundle;
+import android.os.Message;
+import android.text.TextUtils;
 import android.util.Log;
 
-import com.meizu.ruandongchuan.dlnatest.service.DLNAService;
+import com.meizu.ruandongchuan.dlnatest.util.DLNAUtil;
+import com.meizu.ruandongchuan.dlnatest.util.HandlerController;
+import com.meizu.ruandongchuan.dlnatest.view.DlnaApp;
+import com.meizu.ruandongchuan.dlnatest.view.activity.FullscreenActivity;
+import com.meizu.ruandongchuan.dlnatest.view.activity.VideoActivity;
 
 import org.cybergarage.upnp.Action;
 import org.cybergarage.upnp.StateVariable;
 import org.cybergarage.upnp.control.ActionListener;
 import org.cybergarage.upnp.control.QueryListener;
+import org.cybergarage.upnp.std.av.server.object.item.ItemNode;
 import org.cybergarage.util.Mutex;
 
 public class AVTransport implements ActionListener, QueryListener
@@ -665,6 +675,11 @@ public class AVTransport implements ActionListener, QueryListener
 	// Customer
 	///////////////////////
 	private String mCurPlayState = STOPPED;
+	private int mCurrentTrack = 1;
+	private String mCurTrackDuration = "00:00:00";
+	private String mCurrentTrackMetaData;
+	private String mCurrentTrackURI;
+	private String mRelativeTimePosition;
 
 	////////////////////////////////////////////////
 	// Constructor 
@@ -769,6 +784,60 @@ public class AVTransport implements ActionListener, QueryListener
 		return avTransInfo;
 	}
 
+	public void setmCurPlayState(String mCurPlayState) {
+		this.mCurPlayState = mCurPlayState;
+	}
+
+	public void updatePositionInfo(String position,String duration){
+		this.mRelativeTimePosition = position;
+		this.mCurTrackDuration = duration;
+		Log.i("updatePositionInfo", "mCurTrackDuration=" + duration + "mRelativeTimePosition=" + mRelativeTimePosition);
+	}
+
+	public void setStateVariable(String ServiceId, String value) {
+		if(getMediaRenderer().getService(ServiceId) != null) {
+			getMediaRenderer().getService(ServiceId).getStateVariable("LastChange")
+					.setValue("<Event xmlns=\"urn:schemas-upnp-org:metadata-1-0/AVT/\"><" + value + "</Event>");
+		}
+	}
+
+	public void play(String url, String metadata) {
+		Uri uri = Uri.parse(url);
+		Intent intent = new Intent(Intent.ACTION_VIEW);
+		intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+		intent.putExtra("metadata", metadata);
+		String type = "";
+		if (TextUtils.isEmpty(metadata)){
+			type = DLNAUtil.getMimeType(url);
+		}else {
+			ItemNode itemNode = DLNAUtil.parseMetaData(metadata);
+			if (itemNode != null) {
+				if (itemNode.isAudioClass()) {
+					type = "audio/*";
+				} else if (itemNode.isImageClass()) {
+					type = "image/*";
+				} else if (itemNode.isMovieClass()) {
+					type = "video/*";
+				}
+			}
+		}
+		if (type.startsWith("audio")){
+			intent.setClass(DlnaApp.getInstance().getApplicationContext(), VideoActivity.class);
+		}else if (type.startsWith("image")){
+			intent.setClass(DlnaApp.getInstance().getApplicationContext(), FullscreenActivity.class);
+		}else if (type.startsWith("video")){
+			intent.setClass(DlnaApp.getInstance().getApplicationContext(), VideoActivity.class);
+		}
+		//intent.setData(uri);
+		intent.setDataAndType(uri, type);
+		Log.i("type=", intent.getType());
+		//LogUtil.i("playlog","url="+url+"metadata="+metadata);
+		Log.i("playmetadata", metadata + "-" );
+		Log.i("playurl", url);
+		//Toast.makeText(getApplicationContext(),metadata,Toast.LENGTH_SHORT).show();
+		DlnaApp.getInstance().startActivity(intent);
+	}
+
 	////////////////////////////////////////////////
 	// ActionListener
 	////////////////////////////////////////////////
@@ -796,7 +865,9 @@ public class AVTransport implements ActionListener, QueryListener
 			setCurrentAvTransInfo(avTransInfo);
 			isActionSuccess = true;
 
+			this.mCurrentTrackMetaData = currentMetaData;
 			this.mCurPlayState = STOPPED;
+			this.mCurrentTrack = 1;
 			Log.i(CURRENTURI,currentUri);
 			Log.i(CURRENTURIMETADATA, currentMetaData);
 			//DLNAService.getInstance().play(avTransInfo.getURI(), avTransInfo.getURIMetaData());
@@ -836,7 +907,7 @@ public class AVTransport implements ActionListener, QueryListener
 			if (speed == 1){
 				this.mCurPlayState = TRANSITIONING;
 			}
-			DLNAService.getInstance().play(getCurrentAvTransInfo().getURI(), getCurrentAvTransInfo().getURIMetaData());
+			play(getCurrentAvTransInfo().getURI(), getCurrentAvTransInfo().getURIMetaData());
 
 			//action.getArgument(SPEED).getRelatedStateVariable().setValue(speed);
 			/*synchronized (avTransInfoList) {
@@ -868,11 +939,26 @@ public class AVTransport implements ActionListener, QueryListener
 			int instanceID = action.getArgument(INSTANCEID).getIntegerValue();
 			//change play state
 			this.mCurPlayState = STOPPED;
+			this.mCurrentTrack = 0;
+
+			Message msg = Message.obtain();
+			msg.what = HandlerController.STOP;
+			DlnaApp.broadcastMessage(msg);
 			isActionSuccess = true;
 		}
 
 		if (actionName.equals(PAUSE)) {
 			int instanceID = action.getArgument(INSTANCEID).getIntegerValue();
+
+			this.mCurPlayState = "PAUSED_PLAYBACK";
+			Message msg = Message.obtain();
+			msg.what = HandlerController.PAUSE;
+			DlnaApp.broadcastMessage(msg);
+			String value = "<Event xmlns=\"urn:schemas-upnp-org:metadata-1-0/AVT/\"><"
+					+ "InstanceID val=\"" + instanceID + "\"><TransportState val=\""
+					+ this.mCurPlayState + "\"/><CurrentTransportActions val=\"Pause\"/></InstanceID>"
+					+ "</Event>";
+			action.getService().getStateVariable("LastChange").setValue(value);
 			isActionSuccess = true;
 		}
 		
@@ -890,16 +976,37 @@ public class AVTransport implements ActionListener, QueryListener
 		if (actionName.equals(GETPOSITIONINFO)) {
 
 			// if(action.getArgument("InstanceID").getValue().equals("1")){
-			action.getArgument(TRACK).setValue("0");
-			action.getArgument(TRACKDURATION).setValue("00:00:00");
-			action.getArgument(RELTIME).setValue("00:00:00");
-			action.getArgument(ABSTIME).setValue(NOT_IMPLEMENTED);
+			action.getArgument(TRACK).setValue(String.valueOf(this.mCurrentTrack));
+			action.getArgument(TRACKDURATION).setValue(mCurTrackDuration);
+			action.getArgument(TRACKURI).setValue(mCurrentTrackURI);
+			action.getArgument(TRACKMETADATA).setValue(mCurrentTrackMetaData);
+			action.getArgument(RELTIME).setValue(mRelativeTimePosition);
+			action.getArgument(ABSTIME).setValue(mRelativeTimePosition);
 			action.getArgument(RELCOUNT).setValue("2147483647");
 			action.getArgument(ABSCOUNT).setValue("2147483647");
 			// }
 			// setAction(action);
 
 			isActionSuccess = true;
+		}
+
+		if (actionName.equals(SEEK)){
+			String unit = action.getArgumentValue("Unit");
+			String seektoTime = action.getArgumentValue("Target");
+			if(!unit.equals("REL_TIME") && !unit.equals("ABS_TIME") && !unit.equals("TRACK_NR")) {
+				action.setStatus(710);
+				return false;
+			}
+
+			if(!this.mCurPlayState.equals(STOPPED)) {
+				Message msg = Message.obtain();
+				msg.what = HandlerController.SEEK;
+				Bundle bundle = new Bundle();
+				bundle.putString("seek",seektoTime);
+				msg.setData(bundle);
+				DlnaApp.broadcastMessage(msg);
+				return true;
+			}
 		}
 
 		if (actionName.equals(GETDEVICECAPABILITIES)) {

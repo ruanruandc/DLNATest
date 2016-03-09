@@ -32,7 +32,7 @@ public class NetworkReceiver extends BroadcastReceiver {
             }
             if ( (netInfo != null) && (netInfo.getDetailedState() == NetworkInfo.DetailedState.CONNECTED) ){
                 Log.i(DLNAService.TAG, "连接到网络" + netInfo.getTypeName());
-                stop(context);
+                //stop(context);
                 // TODO: 3/2/16  
                 start(context);
             }

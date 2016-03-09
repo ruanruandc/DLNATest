@@ -76,15 +76,13 @@
             android:launchMode="singleInstance"
             android:theme="@style/FullscreenTheme">
             <intent-filter>
-                <action android:name="android.intent.action.VIEW"/>
+                <action android:name="android.intent.action.VIEW">
+                </action>
             </intent-filter>
         </activity>
-        <activity
-            android:name="io.vov.vitamio.activity.InitActivity"
-            android:configChanges="orientation|screenSize|smallestScreenSize|keyboard|keyboardHidden|navigation"
-            android:launchMode="singleTop"
-            android:theme="@android:style/Theme.NoTitleBar"
-            android:windowSoftInputMode="stateAlwaysHidden"/>
+        <activity android:name=".view.activity.VideoActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:launchMode="singleInstance"/>
     </application>
 
 </manifest>

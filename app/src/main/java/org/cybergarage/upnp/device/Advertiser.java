@@ -60,15 +60,16 @@ public class Advertiser extends ThreadCore
 		long leaseTime = dev.getLeaseTime();
 		long notifyInterval;
 		while (isRunnable() == true) {
+			dev.announce();
 			notifyInterval = (leaseTime/4) + (long)((float)leaseTime * (Math.random() * 0.25f));
 			Log.i("notifyInterval=",notifyInterval+"");
 			notifyInterval *= 1000;
 			try {
 				Thread.sleep(notifyInterval);
 			} catch (InterruptedException e) {
-
+				e.printStackTrace();
 			}
-			dev.announce();
+
 		}
 	}
 }
